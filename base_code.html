@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Project Kali - Prototype</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 36px;
+      background: #f4f4f4;
+      color: #333;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    button {
+      font-size: 18px;
+      padding: 12px 24px;
+      margin: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      width: 90%;
+      max-width: 300px;
+    }
+    .steps {
+      margin-top: 30px;
+    }
+    .step {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .step img {
+      width: 90%;
+      max-width: 350px;
+      border-radius: 10px;
+      display: block;
+      margin: 15px auto;
+    }
+    .lang {
+      font-size: 24px;
+      line-height: 1.6;
+      font-weight: 500;   /* slightly bolder */
+      margin-bottom: 10px;
+    }
+    #dashboard {
+      max-width: 600px;
+      margin: 40px auto;
+    }
+    .progress-container {
+      margin: 20px 0;
+    }
+    .progress-label {
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    .progress-bar {
+      width: 100%;
+      background-color: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 20px;
+      background-color: #4CAF50;
+      text-align: right;
+      padding-right: 20px;
+      color: white;
+      width: 0%;
+    }
+    .progress-text {
+  color: white;
+  font-weight: bold;
+  font-size: 14px;
+  text-align: center;
+  line-height: 20px;
+  display: block;
+}
+
+  </style>
+</head>
+<body>
+
+<h1>📱 Project Kali: Learn to Use Your Phone</h1>
+
+<div style="text-align: center;">
+  <button onclick="showSteps('youtube')">📺 How to Open YouTube</button>
+  <button onclick="showSteps('call')">📞 How to Make a Call</button>
+  <button onclick="showSteps('camera')">📷 How to Take a Photo</button>
+</div>
+
+<div class="steps" id="steps"></div>
+
+<div id="dashboard">
+  <h2>📊 Dashboard: Task Usage</h2>
+
+  <div class="progress-container">
+  <div class="progress-label">YouTube</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-youtube"><span class="progress-text" id="text-youtube">0%</span></div>
+  </div>
+
+  <div class="progress-label">Call</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-call"><span class="progress-text" id="text-call">0%</span></div>
+  </div>
+
+  <div class="progress-label">Camera</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-camera"><span class="progress-text" id="text-camera">0%</span></div>
+  </div>
+</div>
+
+
+<script>
+const metrics = {
+  youtube: 0,
+  call: 0,
+  camera: 0
+};
+
+function loadProgressFromStorage() {
+  const stored = localStorage.getItem("taskProgress");
+  if (stored) {
+    const parsed = JSON.parse(stored);
+    metrics.youtube = parsed.youtube || 0;
+    metrics.call = parsed.call || 0;
+    metrics.camera = parsed.camera || 0;
+  }
+}
+
+function saveProgressToStorage() {
+  localStorage.setItem("taskProgress", JSON.stringify(metrics));
+}
+
+const allSteps = {
+  youtube: [
+    {
+      en: "Step 1: Unlock your phone.",
+      kn: "ಹಂತ 1: ನಿಮ್ಮ ಫೋನ್ ಅನ್ನು ತೆರೆಯಿರಿ.",
+      img: "images/unlockphone.png"
+    },
+    {
+      en: "Step 2: Look for the YouTube icon on your screen.",
+      kn: "ಹಂತ 2: ನಿಮ್ಮ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ YouTube ಐಕಾನ್ ಅನ್ನು ಹುಡುಕಿ.",
+      img: "images/youtubeicon.jpg"
+    },
+    {
+      en: "Step 3: Tap on the YouTube icon to open it.",
+      kn: "ಹಂತ 3: YouTube ಐಕಾನ್ ಅನ್ನು ಒತ್ತಿರಿ.",
+      img: "images/tapyticon.png"
+    },
+    {
+      en: "Step 4: Tap on the search icon.",
+      kn: "ಹಂತ 4: ಹುಡುಕಾಟ ಐಕಾನ್ ಅನ್ನು ಒತ್ತಿರಿ.",
+      img: "images/ytsearchicon.png"
+    },
+    {
+      en: "Step 5: Tap on the mic icon. Say the name of the video you want to watch out loud.",
+      kn: "ಹಂತ 5: ಮೈಕ್ ಐಕಾನ್ ಒತ್ತಿರಿ. ನೀವು ವೀಕ್ಷಿಸಲು ಬಯಸುವ ವೀಡಿಯೊದ ಹೆಸರನ್ನು ಹೇಳಿ.",
+      img: "images/ytselectmic.png"
+    },
+    {
+      en: "Step 6: Tap the video you were looking for.",
+      kn: "ಹಂತ 6: ನೀವು ಹುಡುಕುತ್ತಿದ್ದ ವೀಡಿಯೊವನ್ನು ಒತ್ತಿರಿ.",
+      img: "images/ytspeak.png"
+    }
+  ],
+  call: [
+    {
+      en: "Step 1: Look for the phone icon on the screen.",
+      kn: "ಹಂತ 1: ನಿಮ್ಮ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿ ದೂರವಾಣಿ ಐಕಾನ್ ಅನ್ನು ಹುಡುಕಿ.",
+      img: "images/phoneicon.png"
+    },
+    {
+      en: "Step 2: Tap on the Phone icon.",
+      kn: "ಹಂತ 2: ಫೋನ್ ಐಕಾನ್ ಮೇಲೆ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+      img: "images/tapphoneicon.png"
+    },
+    {
+      en: "Step 3: Enter the number you want to call.",
+      kn: "ಹಂತ 3: ನೀವು ಕರೆ ಮಾಡಬೇಕಾದ ಸಂಖ್ಯೆಯನ್ನು ನಮೂದಿಸಿ.",
+      img: "images/phonescreen.png"
+    },
+    {
+      en: "Step 4: Press the green call button.",
+      kn: "ಹಂತ 4: ಹಸಿರು ಕಾಲ್ ಬಟನ್ ಒತ್ತಿ.",
+      img: "images/tapcallbutton.png"
+    }
+  ],
+  camera: [
+    {
+      en: "Step 1: Tap the Camera icon on your screen.",
+      kn: "ಹಂತ 1: ನಿಮ್ಮ ಹೋಮ್ ಸ್ಕ್ರೀನ್‌ನಲ್ಲಿರುವ ಕ್ಯಾಮೆರಾ ಐಕಾನ್ ಮೇಲೆ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+      img: "images/tapcameraicon.png"
+    },
+    {
+      en: "Step 2: Hold your phone to what you want to click.",
+      kn: "ಹಂತ 2: ನೀವು ಫೋಟೋ ತೆಗೆದುಕೊಳ್ಳಲು ಬಯಸುವದನ್ನು ಕ್ಯಾಮೆರಾ ಎದುರು ಹಿಡಿಯಿರಿ.",
+      img: "images/framepic.png"
+    },
+    {
+      en: "Step 3: Tap the capture button to take the photo.",
+      kn: "ಹಂತ 3: ಫೋಟೋ ತೆಗೆದುಕೊಳ್ಳಲು ಕ್ಯಾಪ್ಚರ್ ಬಟನ್ ಒತ್ತಿ.",
+      img: "images/clickpic.png"
+    }
+  ]
+};
+
+function showSteps(task) {
+  const steps = allSteps[task];
+  const container = document.getElementById("steps");
+  container.innerHTML = "";
+
+  // Hide the dashboard and progress bars
+  document.getElementById("dashboard").style.display = "none";
+  document.querySelectorAll(".progress-container").forEach(p => p.style.display = "none");
+
+  steps.forEach((step, index) => {
+    const div = document.createElement("div");
+    div.className = "step";
+
+  div.innerHTML = `
+  <div class="lang">${step.en}</div>
+  <div class="lang">${step.kn}</div>
+  <img src="${step.img}" alt="Step ${index + 1}" />
+`;
+
+    container.appendChild(div);
+  });
+
+  // Add "Done" button to update progress and show home again
+  const doneBtn = document.createElement("button");
+  doneBtn.textContent = "✅ Done";
+  doneBtn.onclick = () => {
+    metrics[task] = 1;
+    saveProgressToStorage();
+    showHome();
+  };
+  const btnWrapper = document.createElement("div");
+btnWrapper.style.textAlign = "center";
+btnWrapper.appendChild(doneBtn);
+container.appendChild(btnWrapper);
+}
+
+function updateProgressBars() {
+  const youtubePercent = metrics.youtube === 1 ? 100 : 0;
+  const callPercent = metrics.call === 1 ? 100 : 0;
+  const cameraPercent = metrics.camera === 1 ? 100 : 0;
+
+  document.getElementById("progress-youtube").style.width = youtubePercent + "%";
+  document.getElementById("text-youtube").textContent = youtubePercent + "%";
+
+  document.getElementById("progress-call").style.width = callPercent + "%";
+  document.getElementById("text-call").textContent = callPercent + "%";
+
+  document.getElementById("progress-camera").style.width = cameraPercent + "%";
+  document.getElementById("text-camera").textContent = cameraPercent + "%";
+}
+
+
+function showHome() {
+  document.getElementById("steps").innerHTML = "";
+  document.getElementById("dashboard").style.display = "block";
+  document.querySelectorAll(".progress-container").forEach(p => p.style.display = "block");
+  updateProgressBars();
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadProgressFromStorage();
+  updateProgressBars();
+});
+
+</script>
+
+</body>
+</html>
