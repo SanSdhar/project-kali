@@ -87,9 +87,12 @@
 <h1>📱 Project Kali: Learn to Use Your Phone</h1>
 
 <div style="text-align: center;">
-  <button onclick="showSteps('youtube')">📺 How to Open YouTube</button>
   <button onclick="showSteps('call')">📞 How to Make a Call</button>
   <button onclick="showSteps('camera')">📷 How to Take a Photo</button>
+  <button onclick="showSteps('bluetooth')">🎵 Send Music via Bluetooth</button>
+  <button onclick="showSteps('youtube')">📺 How to Open YouTube</button>
+  <button onclick="showSteps('videocall')">📹 Make WhatsApp Video Call</button>
+  <button onclick="showSteps('gpay')">💸 Use Google Pay</button>
 </div>
 
 <div class="steps" id="steps"></div>
@@ -98,11 +101,6 @@
   <h2>📊 Dashboard: Task Usage</h2>
 
   <div class="progress-container">
-  <div class="progress-label">YouTube</div>
-  <div class="progress-bar">
-    <div class="progress-fill" id="progress-youtube"><span class="progress-text" id="text-youtube">0%</span></div>
-  </div>
-
   <div class="progress-label">Call</div>
   <div class="progress-bar">
     <div class="progress-fill" id="progress-call"><span class="progress-text" id="text-call">0%</span></div>
@@ -112,6 +110,27 @@
   <div class="progress-bar">
     <div class="progress-fill" id="progress-camera"><span class="progress-text" id="text-camera">0%</span></div>
   </div>
+
+  <div class="progress-label">Bluetooth</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-bluetooth"><span class="progress-text" id="text-bluetooth">0%</span></div>
+  </div>
+
+  <div class="progress-label">YouTube</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-youtube"><span class="progress-text" id="text-youtube">0%</span></div>
+  </div>
+
+  <div class="progress-label">WhatsApp Video Call</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-whatsappvc"><span class="progress-text" id="text-whatsappvc">0%</span></div>
+  </div>
+
+  <div class="progress-label">Gpay</div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progress-gpay"><span class="progress-text" id="text-gpay">0%</span></div>
+  </div>
+
 </div>
 
 
@@ -119,7 +138,10 @@
 const metrics = {
   youtube: 0,
   call: 0,
-  camera: 0
+  camera: 0, 
+  bluetooth: 0,
+  videocall: 0,   // or videoCall if you use camelCase elsewhere
+  gpay: 0
 };
 
 function loadProgressFromStorage() {
@@ -129,6 +151,9 @@ function loadProgressFromStorage() {
     metrics.youtube = parsed.youtube || 0;
     metrics.call = parsed.call || 0;
     metrics.camera = parsed.camera || 0;
+    metrics.bluetooth = parsed.bluetooth || 0;
+    metrics.videocall = parsed.videocall || 0;
+    metrics.gpay = parsed.gpay || 0;
   }
 }
 
@@ -159,14 +184,19 @@ const allSteps = {
       img: "images/ytsearchicon.png"
     },
     {
-      en: "Step 5: Tap on the mic icon. Say the name of the video you want to watch out loud.",
-      kn: "ಹಂತ 5: ಮೈಕ್ ಐಕಾನ್ ಒತ್ತಿರಿ. ನೀವು ವೀಕ್ಷಿಸಲು ಬಯಸುವ ವೀಡಿಯೊದ ಹೆಸರನ್ನು ಹೇಳಿ.",
+      en: "Step 5: Tap on the mic icon.",
+      kn: "ಹಂತ 5: ಮೈಕ್ ಐಕಾನ್ ಒತ್ತಿರಿ.",
       img: "images/ytselectmic.png"
     },
     {
-      en: "Step 6: Tap the video you were looking for.",
-      kn: "ಹಂತ 6: ನೀವು ಹುಡುಕುತ್ತಿದ್ದ ವೀಡಿಯೊವನ್ನು ಒತ್ತಿರಿ.",
+      en: "Step 6: Say the name of the video you want to watch out loud.",
+      kn: "ಹಂತ 6: ನೀವು ವೀಕ್ಷಿಸಲು ಬಯಸುವ ವೀಡಿಯೊದ ಹೆಸರನ್ನು ಹೇಳಿ.",
       img: "images/ytspeak.png"
+    },
+    {
+      en: "Step 7: Tap the video you were looking for.",
+      kn: "ಹಂತ 7: ನೀವು ಹುಡುಕುತ್ತಿದ್ದ ವೀಡಿಯೊವನ್ನು ಒತ್ತಿರಿ.",
+      img: "images/ytselectscreen.png"
     }
   ],
   call: [
@@ -177,7 +207,7 @@ const allSteps = {
     },
     {
       en: "Step 2: Tap on the Phone icon.",
-      kn: "ಹಂತ 2: ಫೋನ್ ಐಕಾನ್ ಮೇಲೆ ಟ್ಯಾಪ್ ಮಾಡಿ.",
+      kn: "ಹಂತ 2: ಫೋನ್ ಐಕಾನ್ ಮೇಲೆ ಒತ್ತಿರಿ.",
       img: "images/tapphoneicon.png"
     },
     {
@@ -207,7 +237,94 @@ const allSteps = {
       kn: "ಹಂತ 3: ಫೋಟೋ ತೆಗೆದುಕೊಳ್ಳಲು ಕ್ಯಾಪ್ಚರ್ ಬಟನ್ ಒತ್ತಿ.",
       img: "images/clickpic.png"
     }
-  ]
+  ],
+
+  bluetooth: [
+    {
+    en: "Step 1: Open your phone's Files app.",
+    kn: "ಹಂತ 1: ನಿಮ್ಮ ಫೋನಿನ ಫೈಲ್ಸ್ ಆ್ಯಪ್ ತೆರೆಯಿರಿ.",
+    img: "images/filesicon.png"
+  },
+  {
+   en: "Step 2: Select audio files.",
+   kn: "ಹಂತ 2: ಆಡಿಯೊ ಫೈಲ್‌ಗಳನ್ನು ಆಯ್ಕೆಮಾಡಿ.",
+   img: "images/btfilesaudio.png"
+  },
+  {
+    en: "Step 3: Tap and hold the song you want to send.",
+    kn: "ಹಂತ 3: ನೀವು ಕಳುಹಿಸಲು ಬಯಸುವ ಹಾಡನ್ನು ಒತ್ತಿ ಮತ್ತು ಹಿಡಿದುಕೊಳ್ಳಿ.",
+    img: "images/btselectaudio.png"
+  },
+  {
+    en: "Step 3: Tap the Share button (usually looks like ➤).",
+    kn: "ಹಂತ 3: ಶೇರ್ ಬಟನ್ ಒತ್ತಿರಿ (ಸಾಮಾನ್ಯವಾಗಿ ➤ ಈ ರೀತಿಯಾಗಿ ಕಾಣುತ್ತದೆ).",
+    img: "images/btselectshare.png"
+  },
+  {
+    en: "Step 4: Choose 'Bluetooth' from the list of sharing options.",
+    kn: "ಹಂತ 4: ಹಂಚುವ ಆಯ್ಕೆಗಳ ಪಟ್ಟಿಯಿಂದ 'Bluetooth' ಆಯ್ಕೆಮಾಡಿ.",
+    img: "images/btselect.png"
+  },
+  
+  {
+    en: "Step 5: When the name of the other phone appears, select it to send the song.",
+    kn: "ಹಂತ 5: ಹಾಡನ್ನು ಕಳುಹಿಸಲು, ಇನ್ನೊಂದು ಫೋನ್‌ನ ಹೆಸರಿನ ಮೇಲೆ ಒತ್ತಿರಿ.",
+    img: "images/btselectfriend.png"
+  }
+  ],
+
+  videocall: [
+    {
+    en: "Step 1: Open WhatsApp.",
+    kn: "ಹಂತ 1: WhatsApp ತೆರೆಯಿರಿ.",
+    img: "images/waicon.png"
+  },
+  {
+    en: "Step 2: Tap the chat of the person you want to video call.",
+    kn: "ಹಂತ 2: ನೀವು ವೀಡಿಯೊ ಕರೆ ಮಾಡಲು ಬಯಸುವ ವ್ಯಕ್ತಿಯ ಚಾಟ್ ಅನ್ನು ಟ್ಯಾಪ್ ಮಾಡಿ.",
+    img: "images/wachatscreen.png"
+  },
+  {
+    en: "Step 3: Tap the video camera icon at top-right of your screen.",
+    kn: "ಹಂತ 3: ನಿಮ್ಮ ಸ್ಕ್ರೀನ್ನಲ್ಲಿ ಮೇಲಿನ ಬಲಭಾಗದಲ್ಲಿರುವ ವೀಡಿಯೊ ಕ್ಯಾಮೆರಾ ಐಕಾನ್ ಅನ್ನು ಒತ್ತಿರಿ.",
+    img: "images/wavc.png"
+  }, 
+  {
+    en: "Step 4: Enjoy speaking to your friend.",
+    kn: "ಹಂತ 4: ನಿಮ್ಮ ಸ್ನೇಹಿತನೊಂದಿಗೆ ಮಾತನಾಡುವುದನ್ನು ಆನಂದಿಸಿ.",
+    img: "images/wachat.png"
+  }
+],
+
+gpay: [
+{
+    en: "Step 1: Open Google Pay app.",
+    kn: "ಹಂತ 1: Google Pay ತೆರೆಯಿರಿ.",
+    img: "images/22.png"
+  },
+  {
+    en: "Step 2: Tap on 'Scan any QR code'.",
+    kn: "ಹಂತ 2: 'Scan any QR code' ಐಕಾನ್ ಅನ್ನು ಒತ್ತಿರಿ.",
+    img: "images/23.png"
+  },
+  {
+    en: "Step 3: Point your phone camera at the QR code.",
+    kn: "ಹಂತ 3: ನಿಮ್ಮ ಫೋನ್ ಕ್ಯಾಮೆರಾವನ್ನು QR ಕೋಡ್ ಕಡೆಗೆ ತೋರಿಸಿ.",
+    img: "images/24.png"
+  },
+  {
+    en: "Step 4: Enter the payment amount. Then click on the tick mark.",
+    kn: "ಪಾವತಿ ಮೊತ್ತವನ್ನು ನಮೂದಿಸಿ. ನಂತರ ಟಿಕ್ ಮಾರ್ಕ್ ಒತ್ತಿರಿ.",
+    img: "images/25.png"
+  },
+  {
+    en: "Step 5: Enter your UPI pin. Then tap on the 'Submit' button.",
+    kn: "ನಿಮ್ಮ ಯುಪಿಐ ಪಿನ್ ಅನ್ನು ನಮೂದಿಸಿ. ನಂತರ Submit ಬಟನ್ ಒತ್ತಿರಿ.",
+    img: "images/26.png"
+  }
+],
+
+
 };
 
 function showSteps(task) {
@@ -250,6 +367,17 @@ function updateProgressBars() {
   const youtubePercent = metrics.youtube === 1 ? 100 : 0;
   const callPercent = metrics.call === 1 ? 100 : 0;
   const cameraPercent = metrics.camera === 1 ? 100 : 0;
+  const bluetoothPercent = metrics.bluetooth === 1 ? 100 : 0;
+document.getElementById("progress-bluetooth").style.width = bluetoothPercent + "%";
+document.getElementById("text-bluetooth").textContent = bluetoothPercent + "%";
+
+const videocallPercent = metrics.videocall === 1 ? 100 : 0;
+document.getElementById("progress-whatsappvc").style.width = videocallPercent + "%";
+document.getElementById("text-whatsappvc").textContent = videocallPercent + "%";
+
+const gpayPercent = metrics.googlepay === 1 ? 100 : 0;
+document.getElementById("progress-gpay").style.width = gpayPercent + "%";
+document.getElementById("text-gpay").textContent = gpayPercent + "%";
 
   document.getElementById("progress-youtube").style.width = youtubePercent + "%";
   document.getElementById("text-youtube").textContent = youtubePercent + "%";
